@@ -19,23 +19,29 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 11)
 
 
-add_compile_options(-march=rv32imac -mabi=ilp32 -mcmodel=medlow)
-add_compile_options(-Og -g)
+add_compile_options(-march=rv32imac -mabi=ilp32)
+add_compile_options(-O0 -g)
+add_compile_options(-msmall-data-limit=8 -mno-save-restore
+-fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections
+-Wunused -Wuninitialized -MMD)
 
 # Enable assembler files preprocessing
 add_compile_options($<$<COMPILE_LANGUAGE:ASM>:-x$<SEMICOLON>assembler-with-cpp>)
 
 include_directories(Inc RISCV/Core RISCV/Peripheral/inc RISCV/Debug)
 
-#add_definitions(-DDEBUG -DGD32E230 -DGD32E23x)
-
+#file(GLOB_RECURSE SOURCES "Startup/*.*" "Src/*.*" "RISCV/Core/*.*" "RISCV/Debug/*.*" "RISCV/Peripheral/*.*" "RISCV/Startup/*.*"  "RISCV/stubs/*.*")
 file(GLOB_RECURSE SOURCES "Startup/*.*" "Src/*.*" "RISCV/Core/*.*" "RISCV/Debug/*.*" "RISCV/Peripheral/*.*" "RISCV/Startup/*.*")
 
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/RISCV/Ld/Link.ld)
 
+add_link_options(-msmall-data-limit=8 -mno-save-restore
+        -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections
+        -Wunused -Wuninitialized -MMD)
 add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
 add_link_options(-T ${LINKER_SCRIPT})
 add_link_options(-nostartfiles)
+add_link_options(-march=rv32imac -mabi=ilp32)
 add_link_options(-specs=nano.specs)
 add_link_options(-specs=nosys.specs)
 
